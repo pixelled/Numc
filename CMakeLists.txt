@@ -1,0 +1,83 @@
+cmake_minimum_required(VERSION 3.16)
+project(su20_proj4_pixelled C)
+
+set(CMAKE_C_STANDARD 11)
+
+include_directories(.)
+include_directories(.venv/lib/python3.6/site-packages/numpy/core)
+include_directories(.venv/lib/python3.6/site-packages/numpy/core/include)
+include_directories(.venv/lib/python3.6/site-packages/numpy/core/include/numpy)
+include_directories(.venv/lib/python3.6/site-packages/numpy/core/include/numpy/random)
+include_directories(.venv/lib/python3.6/site-packages/numpy/f2py/src)
+include_directories(.venv/lib64/python3.6/site-packages/numpy/core)
+include_directories(.venv/lib64/python3.6/site-packages/numpy/core/include)
+include_directories(.venv/lib64/python3.6/site-packages/numpy/core/include/numpy)
+include_directories(.venv/lib64/python3.6/site-packages/numpy/core/include/numpy/random)
+include_directories(.venv/lib64/python3.6/site-packages/numpy/f2py/src)
+
+add_executable(su20_proj4_pixelled
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/random/bitgen.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/random/distributions.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/__multiarray_api.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/__ufunc_api.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/_neighborhood_iterator_imp.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/_numpyconfig.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/arrayscalars.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/halffloat.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/noprefix.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_3kcompat.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_common.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_cpu.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_endian.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_interrupt.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_math.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_no_deprecated_api.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/npy_os.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/numpyconfig.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/old_defines.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/oldnumeric.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/ufuncobject.h
+        .venv/lib/python3.6/site-packages/numpy/core/include/numpy/utils.h
+        .venv/lib/python3.6/site-packages/numpy/distutils/mingw/gfortran_vs2003_hack.c
+        .venv/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c
+        .venv/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h
+        .venv/lib/python3.6/site-packages/numpy/f2py/tests/src/array_from_pyobj/wrapmodule.c
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/random/bitgen.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/random/distributions.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/__multiarray_api.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/__ufunc_api.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/_neighborhood_iterator_imp.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/_numpyconfig.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/arrayscalars.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/halffloat.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/noprefix.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_3kcompat.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_common.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_cpu.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_endian.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_interrupt.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_math.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_no_deprecated_api.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/npy_os.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/numpyconfig.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/old_defines.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/oldnumeric.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/ufuncobject.h
+        .venv/lib64/python3.6/site-packages/numpy/core/include/numpy/utils.h
+        .venv/lib64/python3.6/site-packages/numpy/distutils/mingw/gfortran_vs2003_hack.c
+        .venv/lib64/python3.6/site-packages/numpy/f2py/src/fortranobject.c
+        .venv/lib64/python3.6/site-packages/numpy/f2py/src/fortranobject.h
+        .venv/lib64/python3.6/site-packages/numpy/f2py/tests/src/array_from_pyobj/wrapmodule.c
+        mat_test.c
+        matrix.c
+        matrix.h
+        numc.c
+        numc.h)

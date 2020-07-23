@@ -52,7 +52,16 @@ void rand_matrix(matrix *result, unsigned int seed, double low, double high) {
  * call to allocate memory in this function fails. Return 0 upon success.
  */
 int allocate_matrix(matrix **mat, int rows, int cols) {
-    /* TODO: YOUR CODE HERE */
+    if (rows < 1 || cols < 1) return -1;
+    matrix *ptr = (matrix *)malloc(sizeof(matrix));
+    if (ptr == NULL) return -1;
+    ptr -> rows = rows; ptr -> cols = cols;
+    ptr -> data = (double *)calloc(rows * cols, sizeof(double));
+    if (ptr -> data == NULL) return -1;
+    ptr -> ref_cnt = 1;
+    ptr -> parent = NULL;
+    *mat = ptr;
+    return 0;
 }
 
 /*
@@ -63,7 +72,16 @@ int allocate_matrix(matrix **mat, int rows, int cols) {
  * call to allocate memory in this function fails. Return 0 upon success.
  */
 int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int cols) {
-    /* TODO: YOUR CODE HERE */
+    if (rows < 1 || cols < 1) return -1;
+    matrix *ptr = (matrix *)malloc(sizeof(matrix));
+    if (ptr == NULL) return -1;
+    ptr -> rows = rows; ptr -> cols = cols;
+    ptr -> data = from -> data + offset;
+    ptr -> ref_cnt = 2;
+    from ->ref_cnt = 2;
+    ptr -> parent = from;
+    *mat = ptr;
+    return 0;
 }
 
 /*
@@ -73,7 +91,12 @@ int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int co
  * You cannot assume that mat is not NULL.
  */
 void deallocate_matrix(matrix *mat) {
-    /* TODO: YOUR CODE HERE */
+    if (mat -> ref_cnt == 1) {
+        free(mat -> data);
+        free(mat);
+    } else if (mat -> ref_cnt == 2 && mat -> parent != NULL) {
+        free(mat);
+    }
 }
 
 /*
@@ -81,7 +104,7 @@ void deallocate_matrix(matrix *mat) {
  * You may assume `row` and `col` are valid.
  */
 double get(matrix *mat, int row, int col) {
-    /* TODO: YOUR CODE HERE */
+    return mat -> data[col + row * mat -> cols];
 }
 
 /*
@@ -89,14 +112,18 @@ double get(matrix *mat, int row, int col) {
  * `col` are valid
  */
 void set(matrix *mat, int row, int col, double val) {
-    /* TODO: YOUR CODE HERE */
+    mat -> data[col + row * mat -> cols] = val;
 }
 
 /*
  * Sets all entries in mat to val
  */
 void fill_matrix(matrix *mat, double val) {
-    /* TODO: YOUR CODE HERE */
+    for (int r = 0; r < mat -> rows; r++) {
+        for (int c = 0; c < mat -> cols; c++) {
+            mat -> data[c + r * mat -> cols] = val;
+        }
+    }
 }
 
 /*
@@ -104,7 +131,16 @@ void fill_matrix(matrix *mat, double val) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    /* TODO: YOUR CODE HERE */
+    int rows = result -> rows;
+    int cols = result -> cols;
+    if (rows != mat1 -> rows || rows != mat2 -> rows ||
+        cols != mat1 -> cols || cols != mat2 -> cols) {
+        return 1;
+    }
+    for (int i = 0; i < rows * cols; i++) {
+        result -> data[i] = mat1 -> data[i] + mat2 -> data[i];
+    }
+    return 0;
 }
 
 /*
@@ -112,16 +148,45 @@ int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int sub_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    /* TODO: YOUR CODE HERE */
+    int rows = result -> rows;
+    int cols = result -> cols;
+    if (rows != mat1 -> rows || rows != mat2 -> rows ||
+        cols != mat1 -> cols || cols != mat2 -> cols) {
+        return 1;
+    }
+    for (int i = 0; i < rows * cols; i++) {
+        result -> data[i] = mat1 -> data[i] - mat2 -> data[i];
+    }
+    return 0;
 }
 
 /*
- * Store the result of multiplying mat1 and mat2 to `result`.
+ * Store the result of multiplying mat1 and mat2 to result`.
  * Return 0 upon success and a nonzero value upon failure.
  * Remember that matrix multiplication is not the same as multiplying individual elements.
  */
 int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    /* TODO: YOUR CODE HERE */
+    int rows = result -> rows;
+    int cols = result -> cols;
+    int n = mat1 -> cols;
+    if (rows != mat1 -> rows || cols != mat2 -> cols || n != mat2 -> rows) {
+        return 1;
+    }
+    double *buf = (double *)malloc(rows * cols * sizeof(double));
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            double val = 0;
+            for (int i = 0; i < n; i++) {
+                val += mat1 -> data[i + r * n] * mat2 -> data[c + i * cols];
+            }
+            buf[c + r * rows] = val;
+        }
+    }
+    for (int i = 0; i < rows * cols; i++) {
+        result -> data[i] = buf[i];
+    }
+    free(buf);
+    return 0;
 }
 
 /*
@@ -130,7 +195,13 @@ int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  * Remember that pow is defined with matrix multiplication, not element-wise multiplication.
  */
 int pow_matrix(matrix *result, matrix *mat, int pow) {
-    /* TODO: YOUR CODE HERE */
+    for (int i = 0; i < mat -> rows * mat -> cols; i++) {
+        result -> data[i] = mat -> data[i];
+    }
+    for (int i = 1; i < pow; i++) {
+        mul_matrix(result, result, mat);
+    }
+    return 0;
 }
 
 /*
@@ -138,7 +209,15 @@ int pow_matrix(matrix *result, matrix *mat, int pow) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int neg_matrix(matrix *result, matrix *mat) {
-    /* TODO: YOUR CODE HERE */
+    int rows = result -> rows;
+    int cols = result -> cols;
+    if (mat -> rows != rows || mat -> cols != cols) {
+        return 1;
+    }
+    for (int i = 0; i < rows * cols; i++) {
+        result -> data[i] = -mat -> data[i];
+    }
+    return 0;
 }
 
 /*
@@ -146,6 +225,15 @@ int neg_matrix(matrix *result, matrix *mat) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int abs_matrix(matrix *result, matrix *mat) {
-    /* TODO: YOUR CODE HERE */
+    int rows = result -> rows;
+    int cols = result -> cols;
+    if (mat -> rows != rows || mat -> cols != cols) {
+        return 1;
+    }
+    for (int i = 0; i < rows * cols; i++) {
+        double k = mat -> data[i];
+        result -> data[i] = k >= 0 ? k : -k;
+    }
+    return 0;
 }
 
