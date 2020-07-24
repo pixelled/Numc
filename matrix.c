@@ -91,6 +91,7 @@ int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int co
  * You cannot assume that mat is not NULL.
  */
 void deallocate_matrix(matrix *mat) {
+    if (mat == NULL) return;
     if (mat -> ref_cnt == 1) {
         free(mat -> data);
         free(mat);

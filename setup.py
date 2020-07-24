@@ -6,7 +6,7 @@ def main():
     LDFLAGS = ['-fopenmp']
     # Use the setup function we imported and set up the modules.
     # You may find this reference helpful: https://docs.python.org/3.6/extending/building.html
-    module = Extension('numc', sources = ['numc.c'], 
+    module = Extension('numc', sources = ['numc.c', 'matrix.c'],
             extra_compile_args = CFLAGS, extra_link_args = LDFLAGS)
     setup(name = 'numc', ext_modules = [module])
 

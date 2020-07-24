@@ -3,9 +3,6 @@ matrix
 test
 .DS_Store
 core
-cmake-build-debug/
-.idea/
-.venv/
 __pycache__/
 *.py[cod]
 *$py.class

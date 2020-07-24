@@ -312,7 +312,26 @@ static PyMappingMethods Matrix61c_mapping = {
  * instance of Matrix61c, and throw a type error if anything is violated.
  */
 static PyObject *Matrix61c_add(Matrix61c* self, PyObject* args) {
-    /* TODO: YOUR CODE HERE */
+    if (!PyObject_TypeCheck(args, &Matrix61cType)) {
+        PyErr_SetString(PyExc_TypeError, "Argument must of type numc.Matrix!");
+        return NULL;
+    }
+    Matrix61c* mat61c = (Matrix61c*) args;
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int add_failed = add_matrix(new_mat, self->mat, mat61c->mat);
+    if (add_failed) {
+        PyErr_SetString(PyExc_TypeError, "Error when adding matrices");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
@@ -322,7 +341,26 @@ static PyObject *Matrix61c_add(Matrix61c* self, PyObject* args) {
  * instance of Matrix61c, and throw a type error if anything is violated.
  */
 static PyObject *Matrix61c_sub(Matrix61c* self, PyObject* args) {
-    /* TODO: YOUR CODE HERE */
+    if (!PyObject_TypeCheck(args, &Matrix61cType)) {
+        PyErr_SetString(PyExc_TypeError, "Argument must of type numc.Matrix!");
+        return NULL;
+    }
+    Matrix61c* mat61c = (Matrix61c*) args;
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int sub_failed = sub_matrix(new_mat, self->mat, mat61c->mat);
+    if (sub_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Error when subing matrices");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
@@ -332,28 +370,89 @@ static PyObject *Matrix61c_sub(Matrix61c* self, PyObject* args) {
  * instance of Matrix61c, and throw a type error if anything is violated.
  */
 static PyObject *Matrix61c_multiply(Matrix61c* self, PyObject *args) {
-    /* TODO: YOUR CODE HERE */
+    if (!PyObject_TypeCheck(args, &Matrix61cType)) {
+        PyErr_SetString(PyExc_TypeError, "Argument must of type numc.Matrix!");
+        return NULL;
+    }
+    Matrix61c* mat61c = (Matrix61c*) args;
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, mat61c->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int mul_failed = mul_matrix(new_mat, self->mat, mat61c->mat);
+    if (mul_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Error when multiplying matrices");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
  * Negates the given numc.Matrix (Matrix61c).
  */
 static PyObject *Matrix61c_neg(Matrix61c* self) {
-    /* TODO: YOUR CODE HERE */
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int neg_failed = neg_matrix(new_mat, self->mat);
+    if (neg_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Error when negating matrices");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
  * Take the element-wise absolute value of this numc.Matrix (Matrix61c).
  */
 static PyObject *Matrix61c_abs(Matrix61c *self) {
-    /* TODO: YOUR CODE HERE */
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int abs_failed = abs_matrix(new_mat, self->mat);
+    if (abs_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Error when abs matrices");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
  * Raise numc.Matrix (Matrix61c) to the `pow`th power. You can ignore the argument `optional`.
  */
 static PyObject *Matrix61c_pow(Matrix61c *self, PyObject *pow, PyObject *optional) {
-    /* TODO: YOUR CODE HERE */
+    Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
+    matrix *new_mat;
+    int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
+    if (ref_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Allocation Failure");
+        return NULL;
+    }
+    rv->mat = new_mat;
+    rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
+    int pow_failed = pow_matrix(new_mat, self->mat, PyLong_AsLong(pow));
+    if (pow_failed) {
+        PyErr_SetString(PyExc_RuntimeError, "Matrix Exponential Failture");
+        return NULL;
+    }
+    return (PyObject*)rv;
 }
 
 /*
@@ -361,7 +460,12 @@ static PyObject *Matrix61c_pow(Matrix61c *self, PyObject *pow, PyObject *optiona
  * define. You might find this link helpful: https://docs.python.org/3.6/c-api/typeobj.html
  */
 static PyNumberMethods Matrix61c_as_number = {
-    /* TODO: YOUR CODE HERE */
+    .nb_add = (binaryfunc) Matrix61c_add,
+    .nb_subtract = (binaryfunc) Matrix61c_sub,
+    .nb_multiply = (binaryfunc) Matrix61c_multiply,
+    .nb_power = (ternaryfunc) Matrix61c_pow,
+    .nb_negative = (unaryfunc) Matrix61c_neg,
+    .nb_absolute = (unaryfunc) Matrix61c_abs,
 };
 
 
@@ -371,7 +475,18 @@ static PyNumberMethods Matrix61c_as_number = {
  * This function should return None in Python.
  */
 static PyObject *Matrix61c_set_value(Matrix61c *self, PyObject* args) {
-    /* TODO: YOUR CODE HERE */
+    int row, col; double val;
+    if (PyArg_ParseTuple(args, "iid", &row, &col, &val)) {
+        if (row < self->mat->rows && col < self->mat->cols) {
+            set(self->mat, row, col, val);
+            return Py_None;
+        }
+        PyErr_SetString(PyExc_IndexError, "Index out of range");
+        return NULL;
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Invalid arguments");
+        return NULL;
+    }
 }
 
 /*
@@ -380,7 +495,18 @@ static PyObject *Matrix61c_set_value(Matrix61c *self, PyObject* args) {
  * float.
  */
 static PyObject *Matrix61c_get_value(Matrix61c *self, PyObject* args) {
-    /* TODO: YOUR CODE HERE */
+    int row, col;
+    if (PyArg_ParseTuple(args, "ii", &row, &col)) {
+        if (row < self->mat->rows && col < self->mat->cols) {
+            double val = get(self->mat, row, col);
+            return PyFloat_FromDouble(val);
+        }
+        PyErr_SetString(PyExc_IndexError, "Index out of range");
+        return NULL;
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Invalid arguments");
+        return NULL;
+    }
 }
 
 /*
@@ -390,7 +516,8 @@ static PyObject *Matrix61c_get_value(Matrix61c *self, PyObject* args) {
  * You might find this link helpful: https://docs.python.org/3.6/c-api/structures.html
  */
 static PyMethodDef Matrix61c_methods[] = {
-    /* TODO: YOUR CODE HERE */
+    {"get", (PyCFunction) Matrix61c_get_value, METH_VARARGS, NULL},
+    {"set", (PyCFunction) Matrix61c_set_value, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
 
