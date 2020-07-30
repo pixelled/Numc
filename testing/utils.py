@@ -19,7 +19,11 @@ decimal_places = 6
 Returns a dumbpy matrix and a numc matrix with the same data
 """
 def rand_dp_nc_matrix(*args, **kwargs):
-    dp_mat, nc_mat = dp.Matrix(*args, **kwargs), nc.Matrix(*args, **kwargs)
+    dp_mat, nc_mat = None, None
+    if len(kwargs) == 0:
+        dp_mat, nc_mat = dp.Matrix(*args), nc.Matrix(*args)
+    else:
+        dp_mat, nc_mat = dp.Matrix(*args, **kwargs), nc.Matrix(*args, **kwargs)
     return dp_mat, nc_mat
 
 """
@@ -42,3 +46,4 @@ def rand_md5(mat: Union[dp.Matrix, nc.Matrix]):
         j = np.random.randint(cols)
         m.update(struct.pack("f", round(mat.get(i, j), decimal_places)))
     return m.digest()
+    

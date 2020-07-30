@@ -12,11 +12,11 @@ Hint: use rand_dp_nc_matrix to generate dumbpy and numc matrices with the same d
 """
 class TestAddCorrectness:
     def test_small_add(self):
-        dumbmat1, ncmat1 = rand_dp_nc_matrix([[1, 2, 3], [4, 5, 6]])
-        dumbmat2, ncmat2 = rand_dp_nc_matrix([[1, 2, 3], [4, 5, 6]])
-        dumbres = dumbmat1 + dumbmat2
-        ncres = ncmat1 + ncmat2
-        assert cmp_dp_nc_matrix(dumbres, ncres) == True
+        dp1, nc1 = rand_dp_nc_matrix(2, 3, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(2, 3, rand=True)
+        dpr = dp1 + dp2
+        ncr = nc1 + nc2
+        assert(cmp_dp_nc_matrix(dpr, ncr))
 
     def test_medium_add(self):
         # TODO: YOUR CODE HERE
@@ -28,8 +28,11 @@ class TestAddCorrectness:
 
 class TestSubCorrectness:
     def test_small_sub(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(2, 3, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(2, 3, rand=True)
+        dpr = dp1 - dp2
+        ncr = nc1 - nc2
+        assert(cmp_dp_nc_matrix(dpr, ncr))
 
     def test_medium_sub(self):
         # TODO: YOUR CODE HERE

@@ -132,13 +132,9 @@ void fill_matrix(matrix *mat, double val) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    int rows = result -> rows;
-    int cols = result -> cols;
-    if (rows != mat1 -> rows || rows != mat2 -> rows ||
-        cols != mat1 -> cols || cols != mat2 -> cols) {
-        return 1;
-    }
-    for (int i = 0; i < rows * cols; i++) {
+    if (mat1 -> rows != mat2 -> rows || mat1 -> cols != mat2 -> cols) { return 1; }
+    int d = mat1 -> rows * mat1 -> cols;
+    for (int i = 0; i < d; i++) {
         result -> data[i] = mat1 -> data[i] + mat2 -> data[i];
     }
     return 0;
@@ -149,13 +145,9 @@ int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int sub_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    int rows = result -> rows;
-    int cols = result -> cols;
-    if (rows != mat1 -> rows || rows != mat2 -> rows ||
-        cols != mat1 -> cols || cols != mat2 -> cols) {
-        return 1;
-    }
-    for (int i = 0; i < rows * cols; i++) {
+    if (mat1 -> rows != mat2 -> rows || mat1 -> cols != mat2 -> cols) { return 1; }
+    int d = mat1 -> rows * mat1 -> cols;
+    for (int i = 0; i < d; i++) {
         result -> data[i] = mat1 -> data[i] - mat2 -> data[i];
     }
     return 0;

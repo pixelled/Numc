@@ -328,7 +328,7 @@ static PyObject *Matrix61c_add(Matrix61c* self, PyObject* args) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int add_failed = add_matrix(new_mat, self->mat, mat61c->mat);
     if (add_failed) {
-        PyErr_SetString(PyExc_TypeError, "Error when adding matrices");
+        PyErr_SetString(PyExc_TypeError, "Add Error");
         return NULL;
     }
     return (PyObject*)rv;
@@ -357,7 +357,7 @@ static PyObject *Matrix61c_sub(Matrix61c* self, PyObject* args) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int sub_failed = sub_matrix(new_mat, self->mat, mat61c->mat);
     if (sub_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Error when subing matrices");
+        PyErr_SetString(PyExc_RuntimeError, "Subtraction Error");
         return NULL;
     }
     return (PyObject*)rv;
