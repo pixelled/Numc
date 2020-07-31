@@ -36,10 +36,18 @@ class TestAddPerformance:
         pass
 
     def test_medium_add(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp_start = time.time()
+        dpr = dp1 + dp2
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = nc1 + nc2
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nAdd Speedup: {}".format(speedup))
 
-    def test_medium_add(self):
+    def test_large_add(self):
         # TODO: YOUR CODE HERE
         pass
 
@@ -49,8 +57,16 @@ class TestSubPerformance:
         pass
 
     def test_medium_sub(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp_start = time.time()
+        dpr = dp1 - dp2
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = nc1 - nc2
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nAdd Speedup: {}".format(speedup))
 
     def test_large_sub(self):
         # TODO: YOUR CODE HERE
@@ -101,8 +117,15 @@ class TestPowPerformance:
         pass
 
     def test_medium_pow(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp, nc = rand_dp_nc_matrix(53,53, rand=True)
+        dp_start = time.time()
+        dpr = dp ** 89
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = nc ** 89
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nPow Speedup: {}".format(speedup))
 
     def test_large_pow(self):
         # TODO: YOUR CODE HERE

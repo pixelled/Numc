@@ -77,8 +77,8 @@ int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int co
     if (ptr == NULL) return -1;
     ptr -> rows = rows; ptr -> cols = cols;
     ptr -> data = from -> data + offset;
-    ptr -> ref_cnt = 2;
-    from ->ref_cnt = 2;
+    ptr -> ref_cnt = 1;
+    from ->ref_cnt += 1;
     ptr -> parent = from;
     *mat = ptr;
     return 0;
@@ -93,9 +93,11 @@ int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int co
 void deallocate_matrix(matrix *mat) {
     if (mat == NULL) return;
     if (mat -> ref_cnt == 1) {
-        free(mat -> data);
-        free(mat);
-    } else if (mat -> ref_cnt == 2 && mat -> parent != NULL) {
+        if (mat -> parent) {
+            mat -> parent -> ref_cnt -= 1;
+        } else {
+            free(mat -> data);
+        }
         free(mat);
     }
 }
@@ -134,7 +136,18 @@ void fill_matrix(matrix *mat, double val) {
 int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
     if (mat1 -> rows != mat2 -> rows || mat1 -> cols != mat2 -> cols) { return 1; }
     int d = mat1 -> rows * mat1 -> cols;
-    for (int i = 0; i < d; i++) {
+    #pragma omp parallel for
+    for (int i = 0; i < d / 8 * 8; i += 8) {
+        result -> data[i] = mat1 -> data[i] + mat2 -> data[i];
+        result -> data[i + 1] = mat1 -> data[i + 1] + mat2 -> data[i + 1];
+        result -> data[i + 2] = mat1 -> data[i + 2] + mat2 -> data[i + 2];
+        result -> data[i + 3] = mat1 -> data[i + 3] + mat2 -> data[i + 3];
+        result -> data[i + 4] = mat1 -> data[i + 4] + mat2 -> data[i + 4];
+        result -> data[i + 5] = mat1 -> data[i + 5] + mat2 -> data[i + 5];
+        result -> data[i + 6] = mat1 -> data[i + 6] + mat2 -> data[i + 6];
+        result -> data[i + 7] = mat1 -> data[i + 7] + mat2 -> data[i + 7];
+    }
+    for (int i = d / 8 * 8; i < d; i += 1) {
         result -> data[i] = mat1 -> data[i] + mat2 -> data[i];
     }
     return 0;
@@ -147,6 +160,7 @@ int add_matrix(matrix *result, matrix *mat1, matrix *mat2) {
 int sub_matrix(matrix *result, matrix *mat1, matrix *mat2) {
     if (mat1 -> rows != mat2 -> rows || mat1 -> cols != mat2 -> cols) { return 1; }
     int d = mat1 -> rows * mat1 -> cols;
+    #pragma omp parallel for
     for (int i = 0; i < d; i++) {
         result -> data[i] = mat1 -> data[i] - mat2 -> data[i];
     }
@@ -159,26 +173,21 @@ int sub_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  * Remember that matrix multiplication is not the same as multiplying individual elements.
  */
 int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
-    int rows = result -> rows;
-    int cols = result -> cols;
-    int n = mat1 -> cols;
-    if (rows != mat1 -> rows || cols != mat2 -> cols || n != mat2 -> rows) {
+    if (mat1 -> cols != mat2 -> rows) {
         return 1;
     }
-    double *buf = (double *)malloc(rows * cols * sizeof(double));
+    int rows = mat1 -> rows;
+    int cols = mat2 -> cols;
+    int n = mat1 -> cols;
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
             double val = 0;
             for (int i = 0; i < n; i++) {
                 val += mat1 -> data[i + r * n] * mat2 -> data[c + i * cols];
             }
-            buf[c + r * rows] = val;
+            result -> data[c + r * cols] = val;
         }
     }
-    for (int i = 0; i < rows * cols; i++) {
-        result -> data[i] = buf[i];
-    }
-    free(buf);
     return 0;
 }
 
@@ -188,12 +197,35 @@ int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  * Remember that pow is defined with matrix multiplication, not element-wise multiplication.
  */
 int pow_matrix(matrix *result, matrix *mat, int pow) {
-    for (int i = 0; i < mat -> rows * mat -> cols; i++) {
-        result -> data[i] = mat -> data[i];
+    int rows = mat -> rows; int cols = mat -> cols;
+    int size = rows * cols;
+    matrix *tmp, *exp;
+    allocate_matrix(&tmp, rows, cols);
+    allocate_matrix(&exp, rows, cols);
+    for (int i = 0; i < size; i++) {
+        result -> data[i] = 0;
+        exp -> data[i] = mat -> data[i];
     }
-    for (int i = 1; i < pow; i++) {
-        mul_matrix(result, result, mat);
+    for (int i = 0; i < mat -> rows; i++) {
+        result -> data[i + i * mat -> cols] = 1;
     }
+    while (pow > 0) {
+        if (pow % 2 == 0) {
+            mul_matrix(tmp, exp, exp);
+            for  (int i = 0; i < size; i++) {
+                exp -> data[i] = tmp -> data[i];
+            }
+            pow /= 2;
+        } else {
+            for (int i = 0; i < size; i++) {
+                tmp -> data[i] = result -> data[i];
+            }
+            mul_matrix(result, tmp, exp);
+            pow--;
+        }
+    }
+    deallocate_matrix(tmp);
+    deallocate_matrix(exp);
     return 0;
 }
 

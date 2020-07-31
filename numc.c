@@ -386,7 +386,7 @@ static PyObject *Matrix61c_multiply(Matrix61c* self, PyObject *args) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int mul_failed = mul_matrix(new_mat, self->mat, mat61c->mat);
     if (mul_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Error when multiplying matrices");
+        PyErr_SetString(PyExc_RuntimeError, "Multiplication Error");
         return NULL;
     }
     return (PyObject*)rv;
