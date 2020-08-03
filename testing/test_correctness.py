@@ -90,14 +90,17 @@ class TestMulCorrectness:
 
     def test_medium_mul(self):
         dp1, nc1 = rand_dp_nc_matrix(20, 30, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(30, 40, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(30, 20, rand=True)
         dpr = dp1 * dp2
         ncr = nc1 * nc2
         assert(cmp_dp_nc_matrix(dpr, ncr))
 
     def test_large_mul(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(203, 303, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(303, 502, rand=True)
+        dpr = dp1 * dp2
+        ncr = nc1 * nc2
+        assert(cmp_dp_nc_matrix(dpr, ncr))
 
 class TestPowCorrectness:
     def test_small_pow(self):

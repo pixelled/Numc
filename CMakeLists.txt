@@ -11,4 +11,4 @@ add_executable(su20_proj4_pixelled
         matrix.c
         matrix.h
         numc.c
-        numc.h)
+        numc.h test.c)

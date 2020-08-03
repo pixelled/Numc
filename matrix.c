@@ -52,7 +52,10 @@ void rand_matrix(matrix *result, unsigned int seed, double low, double high) {
  * call to allocate memory in this function fails. Return 0 upon success.
  */
 int allocate_matrix(matrix **mat, int rows, int cols) {
-    if (rows < 1 || cols < 1) return -1;
+    if (rows < 1 || cols < 1) {
+        PyErr_SetString(PyExc_TypeError, "Invalid Dimension");
+        return -1;
+    }
     matrix *ptr = (matrix *)malloc(sizeof(matrix));
     if (ptr == NULL) return -1;
     ptr -> rows = rows; ptr -> cols = cols;
@@ -72,7 +75,10 @@ int allocate_matrix(matrix **mat, int rows, int cols) {
  * call to allocate memory in this function fails. Return 0 upon success.
  */
 int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int cols) {
-    if (rows < 1 || cols < 1) return -1;
+    if (rows < 1 || cols < 1) {
+        PyErr_SetString(PyExc_TypeError, "Invalid Dimension");
+        return -1;
+    }
     matrix *ptr = (matrix *)malloc(sizeof(matrix));
     if (ptr == NULL) return -1;
     ptr -> rows = rows; ptr -> cols = cols;
@@ -92,12 +98,10 @@ int allocate_matrix_ref(matrix **mat, matrix *from, int offset, int rows, int co
  */
 void deallocate_matrix(matrix *mat) {
     if (mat == NULL) return;
-    if (mat -> ref_cnt == 1) {
-        if (mat -> parent) {
-            mat -> parent -> ref_cnt -= 1;
-        } else {
-            free(mat -> data);
-        }
+    mat -> ref_cnt -= 1;
+    if (!mat -> ref_cnt) {
+        deallocate_matrix(mat -> parent);
+        if (!mat -> parent) free(mat -> data);
         free(mat);
     }
 }
@@ -174,19 +178,62 @@ int sub_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  */
 int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
     if (mat1 -> cols != mat2 -> rows) {
-        return 1;
+        return -1;
     }
-    int rows = mat1 -> rows;
-    int cols = mat2 -> cols;
-    int n = mat1 -> cols;
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-            double val = 0;
-            for (int i = 0; i < n; i++) {
+    int rows = mat1 -> rows; int cols = mat2 -> cols; int n = mat1 -> cols; int s = n >> 2;
+    __m256d _res, _res1; __m256d colt[s], colt1[s]; double arr[4], arr1[4]; double val, val1;
+    #pragma omp parallel for private(colt, colt1, arr, arr1, val, val1)
+    for (int c = 0; c < cols / 2 * 2; c += 2) {
+        int c1 = c + 1;
+        for (int i = 0; i < s; i++) {
+            int k = 4 * i;
+            colt[i] = _mm256_set_pd(mat2 -> data[c + (k + 3) * cols], mat2 -> data[c + (k + 2) * cols],
+                                    mat2 -> data[c + (k + 1) * cols],mat2 -> data[c + k * cols]);
+            colt1[i + 1] = _mm256_set_pd(mat2 -> data[c1 + (k + 3) * cols], mat2 -> data[c1 + (k + 2) * cols],
+                                    mat2 -> data[c1 + (k + 1) * cols],mat2 -> data[c1 + k * cols]);
+        }
+        for (int r = 0; r < rows; r++) {
+            val = 0; val1 = 0;
+            _res = _mm256_set1_pd(0);
+            _res1 = _mm256_set1_pd(0);
+            int k = r * n;
+            for (int i = 0; i < s; i += 1) {
+                _res = _mm256_fmadd_pd(_mm256_loadu_pd(&(mat1 -> data[i * 4 + k])), colt[i], _res);
+                _res1 = _mm256_fmadd_pd(_mm256_loadu_pd(&(mat1 -> data[i * 4 + k])), colt1[i], _res1);
+            }
+            for (int i = s * 4; i < n; i++) {
+                val += mat1 -> data[i + r * n] * mat2 -> data[c + i * cols];
+                val1 += mat1 -> data[i + r * n] * mat2 -> data[c1 + i * cols];
+            }
+            _mm256_storeu_pd(&arr[0], _res);
+            _mm256_storeu_pd(&arr1[0], _res1);
+            val += arr[0] + arr[1] + arr[2] + arr[3];
+            val1 += arr1[0] + arr1[1] + arr1[2] + arr1[3];
+            result -> data[c + r * cols] = val;
+            result -> data[c1 + 1 + r * cols] = val1;
+        }
+    }
+    for (int c = cols / 2 * 2; c < cols; c++) {
+        for (int i = 0; i < s; i += 1) {
+            int k = 4 * i;
+            colt[i] = _mm256_set_pd(mat2 -> data[c + (k + 3) * cols], mat2 -> data[c + (k + 2) * cols],
+                                    mat2 -> data[c + (k + 1) * cols],mat2 -> data[c + k * cols]);
+        }
+        for (int r = 0; r < rows; r++) {
+            val = 0;
+            _res = _mm256_set1_pd(0);
+            int k = r * n;
+            for (int i = 0; i < s; i += 1) {
+                _res = _mm256_fmadd_pd(_mm256_loadu_pd(&(mat1 -> data[i * 4 + k])), colt[i], _res);
+            }
+            for (int i = s * 4; i < n; i++) {
                 val += mat1 -> data[i + r * n] * mat2 -> data[c + i * cols];
             }
+            _mm256_storeu_pd(&arr[0], _res);
+            val += arr[0] + arr[1] + arr[2] + arr[3];
             result -> data[c + r * cols] = val;
         }
+
     }
     return 0;
 }
@@ -198,6 +245,7 @@ int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
  */
 int pow_matrix(matrix *result, matrix *mat, int pow) {
     int rows = mat -> rows; int cols = mat -> cols;
+    if (rows != cols || pow < 0) return -1;
     int size = rows * cols;
     matrix *tmp, *exp;
     allocate_matrix(&tmp, rows, cols);
@@ -234,12 +282,9 @@ int pow_matrix(matrix *result, matrix *mat, int pow) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int neg_matrix(matrix *result, matrix *mat) {
-    int rows = result -> rows;
-    int cols = result -> cols;
-    if (mat -> rows != rows || mat -> cols != cols) {
-        return 1;
-    }
-    for (int i = 0; i < rows * cols; i++) {
+    int d = result -> rows * result -> cols;
+    #pragma omp parallel for
+    for (int i = 0; i < d; i++) {
         result -> data[i] = -mat -> data[i];
     }
     return 0;
@@ -250,12 +295,9 @@ int neg_matrix(matrix *result, matrix *mat) {
  * Return 0 upon success and a nonzero value upon failure.
  */
 int abs_matrix(matrix *result, matrix *mat) {
-    int rows = result -> rows;
-    int cols = result -> cols;
-    if (mat -> rows != rows || mat -> cols != cols) {
-        return 1;
-    }
-    for (int i = 0; i < rows * cols; i++) {
+    int d = mat -> rows * mat -> cols;
+    #pragma omp parallel for
+    for (int i = 0; i < d; i++) {
         double k = mat -> data[i];
         result -> data[i] = k >= 0 ? k : -k;
     }

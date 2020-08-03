@@ -70,6 +70,7 @@ void mul_test(void) {
     }
   }
   mul_matrix(result, mat1, mat2);
+  printf("val: %f ", get(result, 0, 1));
   CU_ASSERT_EQUAL(get(result, 0, 0), 30);
   CU_ASSERT_EQUAL(get(result, 0, 1), 36);
   CU_ASSERT_EQUAL(get(result, 0, 2), 42);

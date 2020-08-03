@@ -357,7 +357,7 @@ static PyObject *Matrix61c_sub(Matrix61c* self, PyObject* args) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int sub_failed = sub_matrix(new_mat, self->mat, mat61c->mat);
     if (sub_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Subtraction Error");
+        PyErr_SetString(PyExc_TypeError, "Subtraction Error");
         return NULL;
     }
     return (PyObject*)rv;
@@ -386,7 +386,7 @@ static PyObject *Matrix61c_multiply(Matrix61c* self, PyObject *args) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int mul_failed = mul_matrix(new_mat, self->mat, mat61c->mat);
     if (mul_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Multiplication Error");
+        PyErr_SetString(PyExc_TypeError, "Multiplication Error");
         return NULL;
     }
     return (PyObject*)rv;
@@ -407,7 +407,7 @@ static PyObject *Matrix61c_neg(Matrix61c* self) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int neg_failed = neg_matrix(new_mat, self->mat);
     if (neg_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Error when negating matrices");
+        PyErr_SetString(PyExc_TypeError, "Error when negating matrices");
         return NULL;
     }
     return (PyObject*)rv;
@@ -428,7 +428,7 @@ static PyObject *Matrix61c_abs(Matrix61c *self) {
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int abs_failed = abs_matrix(new_mat, self->mat);
     if (abs_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Error when abs matrices");
+        PyErr_SetString(PyExc_TypeError, "Error when abs matrices");
         return NULL;
     }
     return (PyObject*)rv;
@@ -438,6 +438,10 @@ static PyObject *Matrix61c_abs(Matrix61c *self) {
  * Raise numc.Matrix (Matrix61c) to the `pow`th power. You can ignore the argument `optional`.
  */
 static PyObject *Matrix61c_pow(Matrix61c *self, PyObject *pow, PyObject *optional) {
+    if (!PyObject_TypeCheck(pow, &PyLong_Type)) {
+        PyErr_SetString(PyExc_TypeError, "Exp must be an integer");
+        return NULL;
+    }
     Matrix61c* rv = (Matrix61c*) Matrix61c_new(&Matrix61cType, NULL, NULL);
     matrix *new_mat;
     int ref_failed = allocate_matrix(&new_mat, self->mat->rows, self->mat->cols);
@@ -449,7 +453,7 @@ static PyObject *Matrix61c_pow(Matrix61c *self, PyObject *pow, PyObject *optiona
     rv->shape = PyTuple_Pack(2, PyLong_FromLong(new_mat->rows), PyLong_FromLong(new_mat->cols));
     int pow_failed = pow_matrix(new_mat, self->mat, PyLong_AsLong(pow));
     if (pow_failed) {
-        PyErr_SetString(PyExc_RuntimeError, "Matrix Exponential Failture");
+        PyErr_SetString(PyExc_TypeError, "Matrix Exponential Failture");
         return NULL;
     }
     return (PyObject*)rv;

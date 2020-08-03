@@ -36,8 +36,8 @@ class TestAddPerformance:
         pass
 
     def test_medium_add(self):
-        dp1, nc1 = rand_dp_nc_matrix(2707, 5449, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp1, nc1 = rand_dp_nc_matrix(8000, 12000, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(8000, 12000, rand=True)
         dp_start = time.time()
         dpr = dp1 + dp2
         dp_end = time.time()
@@ -57,8 +57,8 @@ class TestSubPerformance:
         pass
 
     def test_medium_sub(self):
-        dp1, nc1 = rand_dp_nc_matrix(2707, 5449, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(2707, 5449, rand=True)
+        dp1, nc1 = rand_dp_nc_matrix(8000, 12000, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(8000, 12000, rand=True)
         dp_start = time.time()
         dpr = dp1 - dp2
         dp_end = time.time()
@@ -66,7 +66,7 @@ class TestSubPerformance:
         ncr = nc1 - nc2
         nc_end = time.time()
         speedup = (dp_end - dp_start) / (nc_end - nc_start)
-        print("\nAdd Speedup: {}".format(speedup))
+        print("\nSub Speedup: {}".format(speedup))
 
     def test_large_sub(self):
         # TODO: YOUR CODE HERE
@@ -78,8 +78,15 @@ class TestAbsPerformance:
         pass
 
     def test_medium_abs(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(8000, 12000, rand=True)
+        dp_start = time.time()
+        dpr = abs(dp1)
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = abs(nc1)
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nAbs Speedup: {}".format(speedup))
 
     def test_large_abs(self):
         # TODO: YOUR CODE HERE
@@ -91,8 +98,15 @@ class TestNegPerformance:
         pass
 
     def test_medium_neg(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(8000, 12000, rand=True)
+        dp_start = time.time()
+        dpr = -dp1
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = -nc1
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nNeg Speedup: {}".format(speedup))
 
     def test_large_neg(self):
         # TODO: YOUR CODE HERE
@@ -108,8 +122,16 @@ class TestMulPerformance:
         pass
 
     def test_large_mul(self):
-        # TODO: YOUR CODE HERE
-        pass
+        dp1, nc1 = rand_dp_nc_matrix(500, 700, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(700, 1200, rand=True)
+        dp_start = time.time()
+        dpr = dp1 * dp2
+        dp_end = time.time()
+        nc_start = time.time()
+        ncr = nc1 * nc2
+        nc_end = time.time()
+        speedup = (dp_end - dp_start) / (nc_end - nc_start)
+        print("\nMul Speedup: {}".format(speedup))
 
 class TestPowPerformance:
     def test_small_pow(self):
