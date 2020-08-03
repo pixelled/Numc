@@ -182,14 +182,14 @@ int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
     }
     int rows = mat1 -> rows; int cols = mat2 -> cols; int n = mat1 -> cols; int s = n >> 2;
     __m256d _res, _res1; __m256d colt[s], colt1[s]; double arr[4], arr1[4]; double val, val1;
-    #pragma omp parallel for private(colt, colt1, arr, arr1, val, val1)
+    #pragma omp parallel for private(_res, _res1, colt, colt1, arr, arr1, val, val1)
     for (int c = 0; c < cols / 2 * 2; c += 2) {
         int c1 = c + 1;
         for (int i = 0; i < s; i++) {
             int k = 4 * i;
             colt[i] = _mm256_set_pd(mat2 -> data[c + (k + 3) * cols], mat2 -> data[c + (k + 2) * cols],
                                     mat2 -> data[c + (k + 1) * cols],mat2 -> data[c + k * cols]);
-            colt1[i + 1] = _mm256_set_pd(mat2 -> data[c1 + (k + 3) * cols], mat2 -> data[c1 + (k + 2) * cols],
+            colt1[i] = _mm256_set_pd(mat2 -> data[c1 + (k + 3) * cols], mat2 -> data[c1 + (k + 2) * cols],
                                     mat2 -> data[c1 + (k + 1) * cols],mat2 -> data[c1 + k * cols]);
         }
         for (int r = 0; r < rows; r++) {
@@ -210,7 +210,7 @@ int mul_matrix(matrix *result, matrix *mat1, matrix *mat2) {
             val += arr[0] + arr[1] + arr[2] + arr[3];
             val1 += arr1[0] + arr1[1] + arr1[2] + arr1[3];
             result -> data[c + r * cols] = val;
-            result -> data[c1 + 1 + r * cols] = val1;
+            result -> data[c1 + r * cols] = val1;
         }
     }
     for (int c = cols / 2 * 2; c < cols; c++) {
