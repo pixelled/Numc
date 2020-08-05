@@ -19,8 +19,8 @@ class TestAddCorrectness:
         assert(cmp_dp_nc_matrix(dpr, ncr))
 
     def test_medium_add(self):
-        dp1, nc1 = rand_dp_nc_matrix(25, 25, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(25, 25, rand=True)
+        dp1, nc1 = rand_dp_nc_matrix(25, 28, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(25, 28, rand=True)
         dpr = dp1 + dp2
         ncr = nc1 + nc2
         assert(cmp_dp_nc_matrix(dpr, ncr))
@@ -41,8 +41,8 @@ class TestSubCorrectness:
         assert(cmp_dp_nc_matrix(dpr, ncr))
 
     def test_medium_sub(self):
-        dp1, nc1 = rand_dp_nc_matrix(25, 25, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(25, 25, rand=True)
+        dp1, nc1 = rand_dp_nc_matrix(25, 28, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(25, 28, rand=True)
         dpr = dp1 - dp2
         ncr = nc1 - nc2
         assert(cmp_dp_nc_matrix(dpr, ncr))

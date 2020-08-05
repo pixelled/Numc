@@ -122,8 +122,8 @@ class TestMulPerformance:
         pass
 
     def test_large_mul(self):
-        dp1, nc1 = rand_dp_nc_matrix(500, 700, rand=True)
-        dp2, nc2 = rand_dp_nc_matrix(700, 1200, rand=True)
+        dp1, nc1 = rand_dp_nc_matrix(2000, 3000, rand=True)
+        dp2, nc2 = rand_dp_nc_matrix(3000, 4000, rand=True)
         dp_start = time.time()
         dpr = dp1 * dp2
         dp_end = time.time()
